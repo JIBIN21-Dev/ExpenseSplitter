@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ExpenseSplitter.Data;
 using ExpenseSplitter.Models;
@@ -10,37 +10,27 @@ var builder = WebApplication.CreateBuilder(args);
 // ----------------------------------
 builder.Services.AddControllersWithViews();
 
+
 // ----------------------------------
 // DATABASE CONFIGURATION
 // ----------------------------------
-if (builder.Environment.IsProduction())
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (builder.Environment.IsDevelopment())
+    {
+        // LOCAL SQLITE
+        options.UseSqlite("Data Source=expensesplitter.db");
+    }
+    else
+    {
+        // PRODUCTION - POSTGRES (Render)
+        options.UseNpgsql(
+            builder.Configuration.GetConnectionString("DefaultConnection")
+        );
+    }
+});
 
-    if (string.IsNullOrEmpty(databaseUrl))
-        throw new Exception("DATABASE_URL not found");
 
-    var uri = new Uri(databaseUrl);
-    var userInfo = uri.UserInfo.Split(':');
-
-    var connectionString =
-        $"Host={uri.Host};" +
-        $"Port={uri.Port};" +
-        $"Database={uri.AbsolutePath.Trim('/')};" +
-        $"Username={userInfo[0]};" +
-        $"Password={userInfo[1]};" +
-        $"SSL Mode=Require;" +
-        $"Trust Server Certificate=true";
-
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString));
-}
-else
-{
-    // LOCAL SQLITE
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlite("Data Source=expensesplitter.db"));
-}
 
 // ----------------------------------
 // IDENTITY CONFIGURATION
@@ -85,7 +75,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// ? DISABLED FOR NOW
+// ❌ DISABLED FOR NOW
 // app.UseHttpsRedirection();
 
 app.UseStaticFiles();
