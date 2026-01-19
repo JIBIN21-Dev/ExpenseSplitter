@@ -1,0 +1,44 @@
+﻿@model ExpenseSplitter.ViewModels.CreatePoolViewModel
+@{
+    ViewData["Title"] = "Create Split Pool";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2>Create New Split Pool</h2>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+                <form asp-controller="Pool" asp-action="Create" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label">Pool Title</label>
+                        <input asp-for="Title" class="form-control" placeholder="e.g., Goa Trip, Birthday Party" required />
+                        <small class="text-muted">What is this split for?</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TotalAmount" class="form-label">Total Amount (₹)</label>
+                        <input asp-for="TotalAmount" class="form-control" type="number" step="0.01" min="0" required />
+                        <small class="text-muted">Total money to be split</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Member Emails (One per line)</label>
+                        <textarea name="memberEmailsInput" class="form-control" rows="5" required placeholder="friend1@example.com
+friend2@example.com
+friend3@example.com"></textarea>
+                        <small class="text-muted">Add emails of people who will share this expense. They must be registered first!</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Create Pool</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

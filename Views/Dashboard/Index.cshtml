@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    var memberPools = ViewBag.MemberPools as List<ExpenseSplitter.Models.PoolMember>;
+    var createdPools = ViewBag.CreatedPools as List<ExpenseSplitter.Models.SplitPool>;
+}
+
+<h1>Your Dashboard</h1>
+
+<!-- Pools where you owe money -->
+<div class="card mb-4">
+    <div class="card-header bg-warning">
+        <h3>💰 Your Dues</h3>
+    </div>
+    <div class="card-body">
+        @if (memberPools?.Any() == true)
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Pool Title</th>
+                            <th>Created By</th>
+                            <th>Amount Due</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pm in memberPools)
+                        {
+                            <tr>
+                                <td>@pm.Pool.Title</td>
+                                <td>@pm.Pool.Creator.FullName</td>
+                                <td>₹@pm.AmountDue.ToString("N2")</td>
+                                <td>
+                                    @if (pm.IsCleared)
+                                    {
+                                        <span class="badge bg-success">✅ Paid</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">⏳ Pending</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!pm.IsCleared)
+                                    {
+                                        <form asp-controller="Dashboard" asp-action="MarkAsPaid" method="post" class="d-inline">
+                                            <input type="hidden" name="poolMemberId" value="@pm.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success">Mark as Paid</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No pending payments! 🎉</p>
+        }
+    </div>
+</div>
+
+<!-- Pools you created -->
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h3>📊 Pools You Created</h3>
+    </div>
+    <div class="card-body">
+        @if (createdPools?.Any() == true)
+        {
+            @foreach (var pool in createdPools)
+            {
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5>@pool.Title</h5>
+                        <small>Total: ₹@pool.TotalAmount.ToString("N2")</small>
+                    </div>
+                    <div class="card-body">
+                        @if (pool.IsCompleted)
+                        {
+                            <div class="alert alert-success">
+                                <h4>🎉 Congratulations! Bachhe gaye bankruptcy se! 🎉</h4>
+                                <p>Everyone has paid their share!</p>
+                            </div>
+                        }
+
+                        <h6>Members:</h6>
+                        <ul class="list-group">
+                            @foreach (var member in pool.Members)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @member.User.FullName (@member.User.Email)
+                                    <span>
+                                        ₹@member.AmountDue.ToString("N2")
+                                        @if (member.IsCleared)
+                                        {
+                                            <span class="badge bg-success ms-2">Paid ✅</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning ms-2">Pending ⏳</span>
+                                        }
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+
+                        <a asp-controller="Pool" asp-action="Details" asp-route-id="@pool.Id" class="btn btn-primary mt-3">View Details</a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">You haven't created any pools yet.</p>
+            <a asp-controller="Pool" asp-action="Create" class="btn btn-primary">Create Your First Pool</a>
+        }
+    </div>
+</div>

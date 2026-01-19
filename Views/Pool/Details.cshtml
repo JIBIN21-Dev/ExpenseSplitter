@@ -1,0 +1,80 @@
+﻿@model ExpenseSplitter.Models.SplitPool
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="card">
+    <div class="card-header">
+        <h2>@Model.Title</h2>
+        <p class="mb-0">Created by: @Model.Creator.FullName</p>
+    </div>
+    <div class="card-body">
+        <h4>Total Amount: ₹@Model.TotalAmount.ToString("N2")</h4>
+
+        @if (Model.IsCompleted)
+        {
+            <div class="alert alert-success mt-3">
+                <h3>🎉 Congratulations! Bachhe gaye bankruptcy se! 🎉</h3>
+                <p>All members have cleared their dues!</p>
+            </div>
+        }
+
+        <h5 class="mt-4">Members & Payments:</h5>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Amount Due</th>
+                        <th>Status</th>
+                        <th>Paid At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in Model.Members)
+                    {
+                        <tr>
+                            <td>@member.User.FullName</td>
+                            <td>@member.User.Email</td>
+                            <td>₹@member.AmountDue.ToString("N2")</td>
+                            <td>
+                                @if (member.IsCleared)
+                                {
+                                    <span class="badge bg-success">Paid ✅</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Pending ⏳</span>
+                                }
+                            </td>
+                            <td>@(member.PaidAt?.ToString("dd MMM yyyy") ?? "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (User.Identity?.Name == Model.Creator.Email)
+        {
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Add More Expense</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Pool" asp-action="AddExpense" method="post">
+                        <input type="hidden" name="poolId" value="@Model.Id" />
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" name="additionalAmount" class="form-control" step="0.01" min="0" placeholder="Additional amount" required />
+                            <button type="submit" class="btn btn-primary">Add Expense</button>
+                        </div>
+                        <small class="text-muted">This will be equally distributed among all members</small>
+                    </form>
+                </div>
+            </div>
+        }
+
+        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    </div>
+</div>
