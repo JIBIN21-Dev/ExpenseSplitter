@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using ExpenseSplitter.Data;
+﻿using ExpenseSplitter.Data;
 using ExpenseSplitter.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,27 +11,34 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // --------------------
-// DATABASE
+// DATABASE CONFIG
 // --------------------
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-    if (!string.IsNullOrEmpty(connectionString))
+    if (!string.IsNullOrEmpty(databaseUrl))
     {
         // ✅ POSTGRES (Render)
-        var uri = new Uri(connectionString);
+        var uri = new Uri(databaseUrl);
         var userInfo = uri.UserInfo.Split(':');
 
-        options.UseNpgsql(
-            $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
-            $"Username={userInfo[0]};Password={userInfo[1]};" +
-            $"SSL Mode=Require;Trust Server Certificate=true"
-        );
+        var host = uri.Host;
+        var database = uri.AbsolutePath.TrimStart('/');
+        var username = userInfo[0];
+        var password = userInfo[1];
+        var port = uri.Port > 0 ? uri.Port : 5432; // ✅ FIXED
+
+        var conn =
+            $"Host={host};Port={port};Database={database};" +
+            $"Username={username};Password={password};" +
+            $"SSL Mode=Require;Trust Server Certificate=true";
+
+        options.UseNpgsql(conn);
     }
     else
     {
-        // ✅ SQLITE (Local)
+        // ✅ LOCAL SQLITE
         options.UseSqlite("Data Source=expensesplitter.db");
     }
 });
@@ -39,7 +46,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // --------------------
 // IDENTITY
 // --------------------
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
