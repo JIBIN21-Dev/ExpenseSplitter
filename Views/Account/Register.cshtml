@@ -1,44 +1,395 @@
-﻿@model ExpenseSplitter.ViewModels.RegisterViewModel
+﻿<!-- Views/Account/Register.cshtml -->
+@model ExpenseSplitter.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Register";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h2>Create Account</h2>
+<style>
+    body {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .auth-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .auth-container {
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .auth-card {
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        background: white;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @@keyframes slideUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    .auth-header {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .auth-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s infinite;
+        }
+
+    @@keyframes pulse {
+        0%, 100%
+
+    {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+
+    }
+
+    .auth-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        backdrop-filter: blur(10px);
+        position: relative;
+    }
+
+        .auth-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+    .auth-header h2 {
+        color: white;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+
+    .auth-header p {
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        position: relative;
+    }
+
+    .auth-body {
+        padding: 2.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        z-index: 1;
+    }
+
+    .form-control {
+        height: 55px;
+        padding-left: 50px;
+        border: 2px solid #e8e8e8;
+        border-radius: 15px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        background: #f8f9fa;
+    }
+
+        .form-control:focus {
+            background: white;
+            border-color: #11998e;
+            box-shadow: 0 0 0 4px rgba(17, 153, 142, 0.1);
+        }
+
+            .form-control:focus ~ .input-icon {
+                color: #11998e;
+            }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .helper-text {
+        font-size: 0.85rem;
+        color: #999;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .helper-text i {
+            font-size: 0.75rem;
+        }
+
+    .password-strength {
+        height: 5px;
+        background: #e8e8e8;
+        border-radius: 10px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #ee0979, #ff6a00, #ffdd00, #38ef7d);
+        transition: width 0.3s;
+        border-radius: 10px;
+    }
+
+    .btn-auth {
+        height: 55px;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border: none;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s;
+        margin-top: 1rem;
+    }
+
+        .btn-auth::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-auth:hover::before {
+            left: 100%;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-auth i {
+            margin-left: 8px;
+        }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 2rem 0;
+    }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 2px solid #e8e8e8;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            color: #999;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+    .login-link {
+        text-align: center;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+    }
+
+        .login-link p {
+            margin: 0 0 0.5rem 0;
+            color: #666;
+            font-weight: 500;
+        }
+
+    .btn-outline-custom {
+        border: 2px solid #11998e;
+        color: #11998e;
+        background: white;
+        padding: 0.6rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+        .btn-outline-custom:hover {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .features-list {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+    }
+
+        .features-list h6 {
+            color: #11998e;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .features-list ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .features-list li {
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h2>Join Us Today!</h2>
+                <p>Start splitting expenses with friends</p>
             </div>
-            <div class="card-body">
+
+            <div class="auth-body">
                 <form asp-controller="Account" asp-action="Register" method="post">
-                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
 
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label asp-for="FullName" class="form-label">Full Name</label>
-                        <input asp-for="FullName" class="form-control" required />
+                        <div class="input-wrapper">
+                            <input asp-for="FullName" class="form-control" placeholder="John Doe" required />
+                            <i class="fas fa-user input-icon"></i>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label">Email</label>
-                        <input asp-for="Email" class="form-control" type="email" required />
+                    <div class="form-group">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <div class="input-wrapper">
+                            <input asp-for="Email" class="form-control" type="email" placeholder="john@example.com" required />
+                            <i class="fas fa-envelope input-icon"></i>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label asp-for="Password" class="form-label">Password</label>
-                        <input asp-for="Password" class="form-control" type="password" required />
-                        <small class="text-muted">At least 6 characters with 1 digit</small>
+                        <div class="input-wrapper">
+                            <input asp-for="Password" class="form-control" type="password" placeholder="Create a strong password" required />
+                            <i class="fas fa-lock input-icon"></i>
+                        </div>
+                        <div class="helper-text">
+                            <i class="fas fa-info-circle"></i>
+                            At least 6 characters with 1 digit
+                        </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
-                        <input asp-for="ConfirmPassword" class="form-control" type="password" required />
+                        <div class="input-wrapper">
+                            <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Re-enter your password" required />
+                            <i class="fas fa-lock-open input-icon"></i>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                    <div class="features-list">
+                        <h6>
+                            <i class="fas fa-star"></i> Why join us?
+                        </h6>
+                        <ul>
+                            <li><i class="fas fa-check text-success"></i> Split expenses easily</li>
+                            <li><i class="fas fa-check text-success"></i> Track who owes what</li>
+                            <li><i class="fas fa-check text-success"></i> Manage group payments</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-auth w-100">
+                        Create My Account <i class="fas fa-arrow-right"></i>
+                    </button>
                 </form>
 
-                <div class="mt-3 text-center">
-                    Already have an account? <a asp-controller="Account" asp-action="Login">Login here</a>
+                <div class="divider">
+                    <span>ALREADY REGISTERED?</span>
+                </div>
+
+                <div class="login-link">
+                    <p>Already have an account?</p>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-custom">
+                        <i class="fas fa-sign-in-alt"></i> Login Here
+                    </a>
                 </div>
             </div>
         </div>
