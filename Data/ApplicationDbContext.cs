@@ -1,12 +1,9 @@
-﻿using ExpenseSplitter.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
+using ExpenseSplitter.Models;
 
 namespace ExpenseSplitter.Data
 {
-    // Inherits from IdentityDbContext to get all Identity tables
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -14,48 +11,41 @@ namespace ExpenseSplitter.Data
         {
         }
 
-        // Your custom tables
         public DbSet<SplitPool> SplitPools { get; set; }
         public DbSet<PoolMember> PoolMembers { get; set; }
         public DbSet<SiteVisit> SiteVisits { get; set; }
 
-        // Configure relationships and constraints
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
 
-            // SplitPool relationships
-            builder.Entity<SplitPool>()
-                .HasOne(p => p.Creator)
-                .WithMany(u => u.CreatedPools)
-                .HasForeignKey(p => p.CreatorId)
-                .OnDelete(DeleteBehavior.Restrict); // Don't delete pools if user deleted
+            // Configure SiteVisit
+            modelBuilder.Entity<SiteVisit>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd(); // Ensure auto-increment
+                entity.Property(e => e.VisitDate)
+                    .HasColumnType("date"); // Store as date only
+                entity.HasIndex(e => e.VisitDate)
+                    .IsUnique(); // Ensure one record per date
+            });
 
-            // PoolMember relationships
-            builder.Entity<PoolMember>()
+            // Configure other relationships as needed
+            modelBuilder.Entity<PoolMember>()
                 .HasOne(pm => pm.Pool)
                 .WithMany(p => p.Members)
-                .HasForeignKey(pm => pm.PoolId)
-                .OnDelete(DeleteBehavior.Cascade); // Delete members if pool deleted
+                .HasForeignKey(pm => pm.PoolId);
 
-            builder.Entity<PoolMember>()
+            modelBuilder.Entity<PoolMember>()
                 .HasOne(pm => pm.User)
                 .WithMany(u => u.PoolMemberships)
-                .HasForeignKey(pm => pm.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(pm => pm.UserId);
 
-            // Decimal precision for money
-            builder.Entity<SplitPool>()
-                .Property(p => p.TotalAmount)
-                .HasColumnType("decimal(18,2)");
-
-            builder.Entity<PoolMember>()
-                .Property(pm => pm.AmountDue)
-                .HasColumnType("decimal(18,2)");
-
-            builder.Entity<PoolMember>()
-                .Property(pm => pm.AmountPaid)
-                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<SplitPool>()
+                .HasOne(p => p.Creator)
+                .WithMany(u => u.CreatedPools)
+                .HasForeignKey(p => p.CreatorId);
         }
     }
 }

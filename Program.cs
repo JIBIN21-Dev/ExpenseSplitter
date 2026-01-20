@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 // ----------------------------------
 builder.Services.AddControllersWithViews();
 
-
 // ----------------------------------
 // DATABASE CONFIGURATION
 // ----------------------------------
@@ -24,13 +23,33 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     else
     {
         // PRODUCTION - POSTGRES (Render)
-        options.UseNpgsql(
-            builder.Configuration.GetConnectionString("DefaultConnection")
-        );
+        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            // Parse Render PostgreSQL URL format
+            var uri = new Uri(connectionString);
+            var host = uri.Host;
+            var port = uri.Port;
+            var database = uri.AbsolutePath.TrimStart('/');
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo[0];
+            var password = userInfo[1];
+
+            var npgsqlConnectionString =
+                $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+
+            options.UseNpgsql(npgsqlConnectionString);
+        }
+        else
+        {
+            // Fallback to appsettings
+            options.UseNpgsql(
+                builder.Configuration.GetConnectionString("DefaultConnection")
+            );
+        }
     }
 });
-
-
 
 // ----------------------------------
 // IDENTITY CONFIGURATION
@@ -42,7 +61,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
-
     options.User.RequireUniqueEmail = true;
     options.SignIn.RequireConfirmedEmail = false;
 })
@@ -67,6 +85,29 @@ builder.Services.AddSession();
 var app = builder.Build();
 
 // ----------------------------------
+// AUTO MIGRATION (RUN BEFORE MIDDLEWARE)
+// ----------------------------------
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        logger.LogInformation("Starting database migration...");
+        context.Database.Migrate();
+        logger.LogInformation("Database migration completed successfully!");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+        throw; // Re-throw to prevent app from starting with bad DB
+    }
+}
+
+// ----------------------------------
 // MIDDLEWARE
 // ----------------------------------
 if (!app.Environment.IsDevelopment())
@@ -80,7 +121,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
@@ -92,14 +132,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ----------------------------------
-// AUTO MIGRATION
-// ----------------------------------
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
-}
-
-Console.WriteLine("Application started successfully!");
+Console.WriteLine("✅ Application started successfully!");
 app.Run();

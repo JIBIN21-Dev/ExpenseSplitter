@@ -1,51 +1,178 @@
-﻿@model ExpenseSplitter.Models.SplitPool
+﻿<!-- Views/Pool/Details.cshtml -->
+@model ExpenseSplitter.Models.SplitPool
 @{
     ViewData["Title"] = Model.Title;
 }
 
-<div class="card">
-    <div class="card-header">
-        <h2>@Model.Title</h2>
-        <p class="mb-0">Created by: @Model.Creator.FullName</p>
+<style>
+    .pool-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2.5rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .pool-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .creator-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        display: inline-block;
+    }
+
+    .amount-display {
+        font-size: 3rem;
+        font-weight: bold;
+        text-align: center;
+        margin: 2rem 0;
+        color: #667eea;
+    }
+
+    .celebration-card {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
+        margin-bottom: 2rem;
+    }
+
+        .celebration-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+    .members-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+        .table thead th {
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-paid {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .add-expense-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        margin-top: 2rem;
+    }
+
+    .expense-input-group {
+        display: flex;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+        .expense-input-group input {
+            flex: 1;
+            height: 3.5rem;
+        }
+
+        .expense-input-group button {
+            height: 3.5rem;
+            padding: 0 2rem;
+        }
+</style>
+
+<div class="pool-header">
+    <div class="pool-title">
+        <i class="fas fa-layer-group"></i> @Model.Title
     </div>
+    <div class="creator-badge">
+        <i class="fas fa-user-crown"></i> Created by @Model.Creator.FullName
+    </div>
+</div>
+
+<div class="card">
     <div class="card-body">
-        <h4>Total Amount: ₹@Model.TotalAmount.ToString("N2")</h4>
+        <div class="amount-display">
+            <i class="fas fa-coins"></i> ₹@Model.TotalAmount.ToString("N2")
+        </div>
 
         @if (Model.IsCompleted)
         {
-            <div class="alert alert-success mt-3">
-                <h3>🎉 Congratulations! Bachhe gaye bankruptcy se! 🎉</h3>
-                <p>All members have cleared their dues!</p>
+            <div class="celebration-card">
+                <h3>🎉 Congratulations! 🎉</h3>
+                <p class="fs-5 mb-0">Bachhe gaye bankruptcy se!</p>
+                <p class="mb-0 opacity-75">All members have cleared their dues!</p>
             </div>
         }
 
-        <h5 class="mt-4">Members & Payments:</h5>
-        <div class="table-responsive">
-            <table class="table table-striped">
+        <h4 class="mb-3 fw-bold" style="color: #667eea;">
+            <i class="fas fa-users"></i> Members & Payments
+        </h4>
+
+        <div class="members-table">
+            <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Amount Due</th>
-                        <th>Status</th>
-                        <th>Paid At</th>
+                        <th><i class="fas fa-user"></i> Name</th>
+                        <th><i class="fas fa-envelope"></i> Email</th>
+                        <th><i class="fas fa-rupee-sign"></i> Amount Due</th>
+                        <th><i class="fas fa-check-circle"></i> Status</th>
+                        <th><i class="fas fa-calendar"></i> Paid At</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var member in Model.Members)
                     {
                         <tr>
-                            <td>@member.User.FullName</td>
-                            <td>@member.User.Email</td>
-                            <td>₹@member.AmountDue.ToString("N2")</td>
+                            <td class="fw-semibold">@member.User.FullName</td>
+                            <td class="text-muted">@member.User.Email</td>
+                            <td class="fw-bold">₹@member.AmountDue.ToString("N2")</td>
                             <td>
                                 @if (member.IsCleared)
                                 {
-                                    <span class="badge bg-success">Paid ✅</span>
+                                    <span class="status-badge status-paid">
+                                        <i class="fas fa-check"></i> Paid
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-warning">Pending ⏳</span>
+                                    <span class="status-badge status-pending">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
                                 }
                             </td>
                             <td>@(member.PaidAt?.ToString("dd MMM yyyy") ?? "-")</td>
@@ -57,24 +184,34 @@
 
         @if (User.Identity?.Name == Model.Creator.Email)
         {
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5>Add More Expense</h5>
-                </div>
-                <div class="card-body">
-                    <form asp-controller="Pool" asp-action="AddExpense" method="post">
-                        <input type="hidden" name="poolId" value="@Model.Id" />
+            <div class="add-expense-card">
+                <h5 class="fw-bold mb-3" style="color: #667eea;">
+                    <i class="fas fa-plus-circle"></i> Add More Expense
+                </h5>
+                <form asp-controller="Pool" asp-action="AddExpense" method="post">
+                    <input type="hidden" name="poolId" value="@Model.Id" />
+                    <div class="expense-input-group">
                         <div class="input-group">
-                            <span class="input-group-text">₹</span>
-                            <input type="number" name="additionalAmount" class="form-control" step="0.01" min="0" placeholder="Additional amount" required />
-                            <button type="submit" class="btn btn-primary">Add Expense</button>
+                            <span class="input-group-text">
+                                <i class="fas fa-rupee-sign"></i>
+                            </span>
+                            <input type="number" name="additionalAmount" class="form-control" step="0.01" min="0" placeholder="Enter additional amount" required />
                         </div>
-                        <small class="text-muted">This will be equally distributed among all members</small>
-                    </form>
-                </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Expense
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-info-circle"></i> This will be equally distributed among all members
+                    </small>
+                </form>
             </div>
         }
 
-        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary mt-3">Back to Dashboard</a>
+        <div class="text-center mt-4">
+            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
     </div>
 </div>
