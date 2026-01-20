@@ -122,26 +122,6 @@ namespace Expense1.Migrations
                     b.ToTable("PoolMembers");
                 });
 
-            modelBuilder.Entity("ExpenseSplitter.Models.SiteVisit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("VisitCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("VisitDate")
-                        .HasColumnType("date");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VisitDate")
-                        .IsUnique();
-
-                    b.ToTable("SiteVisits");
-                });
-
             modelBuilder.Entity("ExpenseSplitter.Models.SplitPool", b =>
                 {
                     b.Property<int>("Id")

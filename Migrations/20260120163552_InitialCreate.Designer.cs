@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Expense1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260120044524_ConfigureSiteVisitProperly")]
-    partial class ConfigureSiteVisitProperly
+    [Migration("20260120163552_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -123,26 +123,6 @@ namespace Expense1.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("PoolMembers");
-                });
-
-            modelBuilder.Entity("ExpenseSplitter.Models.SiteVisit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("VisitCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("VisitDate")
-                        .HasColumnType("date");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VisitDate")
-                        .IsUnique();
-
-                    b.ToTable("SiteVisits");
                 });
 
             modelBuilder.Entity("ExpenseSplitter.Models.SplitPool", b =>

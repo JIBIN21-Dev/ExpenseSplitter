@@ -53,20 +53,6 @@ namespace Expense1.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SiteVisits",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    VisitDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    VisitCount = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SiteVisits", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -179,7 +165,7 @@ namespace Expense1.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     IsCompleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     CreatorId = table.Column<string>(type: "TEXT", nullable: false)
@@ -192,7 +178,7 @@ namespace Expense1.Migrations
                         column: x => x.CreatorId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -203,8 +189,8 @@ namespace Expense1.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     PoolId = table.Column<int>(type: "INTEGER", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    AmountDue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AmountDue = table.Column<decimal>(type: "TEXT", nullable: false),
+                    AmountPaid = table.Column<decimal>(type: "TEXT", nullable: false),
                     IsCleared = table.Column<bool>(type: "INTEGER", nullable: false),
                     PaidAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
@@ -216,7 +202,7 @@ namespace Expense1.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PoolMembers_SplitPools_PoolId",
                         column: x => x.PoolId,
@@ -298,9 +284,6 @@ namespace Expense1.Migrations
 
             migrationBuilder.DropTable(
                 name: "PoolMembers");
-
-            migrationBuilder.DropTable(
-                name: "SiteVisits");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
