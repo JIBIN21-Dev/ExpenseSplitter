@@ -1,4 +1,4 @@
-﻿<!-- Main layout used by all pages -->
+﻿<!-- Views/Shared/_Layout.cshtml -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,15 +6,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Expense Splitter</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { padding-top: 60px; }
-        .nav-link.active { font-weight: bold; }
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --danger-gradient: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: var(--primary-gradient) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .navbar-brand i {
+                font-size: 1.8rem;
+            }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+        }
+
+            .nav-link:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-2px);
+            }
+
+        .btn-link.nav-link {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: white;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            }
+
+        .card-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 1.5rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            padding: 0.8rem;
+            transition: all 0.3s;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="/">💰 Expense Splitter</a>
+            <a class="navbar-brand text-white" href="/">
+                <i class="fas fa-wallet"></i>
+                Expense Splitter
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -23,27 +122,39 @@
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Pool" asp-action="Create">Create Pool</a>
+                            <a class="nav-link" asp-controller="Pool" asp-action="Create">
+                                <i class="fas fa-plus-circle"></i> Create Pool
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <span class="nav-link">Hello, @User.Identity.Name</span>
+                            <span class="nav-link">
+                                <i class="fas fa-user"></i> @User.Identity.Name
+                            </span>
                         </li>
                         <li class="nav-item">
                             <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-link nav-link">Logout</button>
+                                <button type="submit" class="btn-link nav-link">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
                             </form>
                         </li>
                     }
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                            <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
                         </li>
                     }
                 </ul>
@@ -58,38 +169,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-<!-- Views/Home/Index.cshtml -->
-<!-- Landing page -->
-@{
-    ViewData["Title"] = "Home";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome to Expense Splitter! 🎉</h1>
-    <p class="lead">Split bills with friends easily. Track who owes what. Never argue about money again!</p>
-
-    <div class="alert alert-info mt-4">
-        <strong>👥 Total Visitors:</strong> @ViewBag.TotalVisits
-    </div>
-
-    <div class="mt-5">
-        <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg me-3">Get Started</a>
-        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-lg">Login</a>
-    </div>
-
-    <div class="row mt-5">
-        <div class="col-md-4">
-            <h3>📝 Create Pool</h3>
-            <p>Create a split pool for trips, parties, or any group expense</p>
-        </div>
-        <div class="col-md-4">
-            <h3>👥 Add Friends</h3>
-            <p>Add members by email and split costs equally</p>
-        </div>
-        <div class="col-md-4">
-            <h3>💸 Track Payments</h3>
-            <p>See who paid and who still owes money</p>
-        </div>
-    </div>
-</div>

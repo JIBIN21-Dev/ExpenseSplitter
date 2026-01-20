@@ -5,8 +5,14 @@
 }
 
 <style>
+    /* Override layout body background */
     body {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+        min-height: 100vh !important;
+    }
+
+    .container {
+        background: transparent !important;
     }
 
     .auth-wrapper {
@@ -174,22 +180,6 @@
         .helper-text i {
             font-size: 0.75rem;
         }
-
-    .password-strength {
-        height: 5px;
-        background: #e8e8e8;
-        border-radius: 10px;
-        margin-top: 0.5rem;
-        overflow: hidden;
-    }
-
-    .password-strength-bar {
-        height: 100%;
-        width: 0;
-        background: linear-gradient(90deg, #ee0979, #ff6a00, #ffdd00, #38ef7d);
-        transition: width 0.3s;
-        border-radius: 10px;
-    }
 
     .btn-auth {
         height: 55px;
