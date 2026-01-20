@@ -1,5 +1,6 @@
 // Home page with visitor counter
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ExpenseSplitter.Data;
 using ExpenseSplitter.Models;
 
@@ -17,12 +18,15 @@ namespace ExpenseSplitter.Controllers
         public IActionResult Index()
         {
             // Track visitor count
-            var today = DateTime.UtcNow.Date;
-            var visit = _context.SiteVisits.FirstOrDefault(v => v.VisitDate == today);
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            // Use DateOnly comparison or EF.Functions for proper SQL translation
+            var visit = _context.SiteVisits
+                .FirstOrDefault(v => EF.Functions.DateDiffDay(v.VisitDate, DateTime.UtcNow) == 0);
 
             if (visit == null)
             {
-                visit = new SiteVisit { VisitDate = today, VisitCount = 1 };
+                visit = new SiteVisit { VisitDate = DateTime.UtcNow.Date, VisitCount = 1 };
                 _context.SiteVisits.Add(visit);
             }
             else
