@@ -13,25 +13,15 @@ namespace ExpenseSplitter.Data
 
         public DbSet<SplitPool> SplitPools { get; set; }
         public DbSet<PoolMember> PoolMembers { get; set; }
-        public DbSet<SiteVisit> SiteVisits { get; set; }
+        // REMOVED: public DbSet<SiteVisit> SiteVisits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure SiteVisit
-            modelBuilder.Entity<SiteVisit>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id)
-                    .ValueGeneratedOnAdd(); // Ensure auto-increment
-                entity.Property(e => e.VisitDate)
-                    .HasColumnType("date"); // Store as date only
-                entity.HasIndex(e => e.VisitDate)
-                    .IsUnique(); // Ensure one record per date
-            });
+            // REMOVED: SiteVisit configuration
 
-            // Configure other relationships as needed
+            // Configure PoolMember relationships
             modelBuilder.Entity<PoolMember>()
                 .HasOne(pm => pm.Pool)
                 .WithMany(p => p.Members)
