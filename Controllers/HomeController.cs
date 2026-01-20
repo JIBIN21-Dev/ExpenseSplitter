@@ -16,29 +16,40 @@ namespace ExpenseSplitter.Controllers
 
         public IActionResult Index()
         {
-            // Track visitor count
-            var today = DateTime.UtcNow.Date;
+            // TEMPORARILY DISABLED: Visitor tracking is causing database errors
+            // We'll fix the SiteVisits table later
 
-            // Load visits in memory to avoid EF translation issues
-            var visit = _context.SiteVisits
-                .AsEnumerable() // Switch to client evaluation
-                .FirstOrDefault(v => v.VisitDate.Date == today);
+            // Set default value for now
+            ViewBag.TotalVisits = 0;
 
-            if (visit == null)
+            /* COMMENTED OUT UNTIL DATABASE IS FIXED
+            try
             {
-                visit = new SiteVisit { VisitDate = today, VisitCount = 1 };
-                _context.SiteVisits.Add(visit);
+                var today = DateTime.UtcNow.Date;
+                var allVisits = _context.SiteVisits.ToList();
+                var visit = allVisits.FirstOrDefault(v => v.VisitDate.Date == today);
+
+                if (visit == null)
+                {
+                    visit = new SiteVisit { VisitDate = today, VisitCount = 1 };
+                    _context.SiteVisits.Add(visit);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    visit.VisitCount++;
+                    _context.SiteVisits.Update(visit);
+                    _context.SaveChanges();
+                }
+
+                ViewBag.TotalVisits = _context.SiteVisits.Sum(v => v.VisitCount);
             }
-            else
+            catch (Exception ex)
             {
-                visit.VisitCount++;
+                ViewBag.TotalVisits = 0;
+                Console.WriteLine($"Visitor tracking error: {ex.Message}");
             }
-
-            _context.SaveChanges();
-
-            // Get total visits
-            var totalVisits = _context.SiteVisits.Sum(v => v.VisitCount);
-            ViewBag.TotalVisits = totalVisits;
+            */
 
             return View();
         }
